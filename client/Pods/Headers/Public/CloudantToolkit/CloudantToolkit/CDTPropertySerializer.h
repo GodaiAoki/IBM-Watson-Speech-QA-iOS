@@ -1,1 +1,0 @@
-../../../../CloudantToolkit/Frameworks/CloudantToolkit.framework/Headers/CDTPropertySerializer.h
