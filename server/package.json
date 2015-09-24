@@ -10,7 +10,8 @@
     "jade": "~1.9.1",
     "ua-parser-js": "~0.7.3",
     "watson-developer-cloud": "~0.9.8",
-    "cf-deployment-tracker-client": "*"
+    "cf-deployment-tracker-client": "*",
+    "mstranslator":"*"
   },
   "engines": {
     "node": ">=0.10.36"

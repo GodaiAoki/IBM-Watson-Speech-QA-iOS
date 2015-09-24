@@ -3,15 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>Backend_GUID</key>
-	<string>you AMA UID goes here</string>
+	<string>a766c489-d512-44fc-a290-bd4e41624ed3</string>
 	<key>Backend_Route</key>
-	<string>your app route goes here</string>
+	<string>https://ask-dr-watson-app-ga.mybluemix.net</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.tricedesigns.WasonSpeechQA</string>
+	<string>com.ise.jp.ga.watsonqa</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

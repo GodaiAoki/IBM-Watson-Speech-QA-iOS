@@ -7,7 +7,8 @@
 //
 
 #import "ViewController.h"
-
+//add
+#import "SpeechManager.h"
 
 @interface ViewController ()
 
@@ -30,6 +31,8 @@
     NSString *server = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"Backend_Route"];
     transcribeURL = [NSString stringWithFormat:@"%@/transcribe", server];
     askURL = [NSString stringWithFormat:@"%@/ask", server];
+    //add
+    translateURL = [NSString stringWithFormat:@"%@/translate", server];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -52,7 +55,7 @@
     [logger logDebugWithMessages:@"setMicActiveState"];
     if (!self.recordButton.selected) {
         self.recordButton.selected = YES;
-        [self.queryLabel setText:@"What can Watson help you with today?"];
+        [self.queryLabel setText:@"Watsonに何かご質問はありますか？"];
         
         [self startRecording];
     }
@@ -64,7 +67,8 @@
     self.recordButton.selected = NO;
     [self.activityView startAnimating];
     [self.activityView setHidden:NO];
-    [self.queryLabel setText:@"Let me check that for you..."];
+    //[self.queryLabel setText:@"Let me check that for you..."];
+    [self.queryLabel setText:@"確認しています。少々お待ち下さい..."];
     
     [self stopRecording];
 }
@@ -227,8 +231,18 @@
             [logger logErrorWithMessages:@"Unable to retrieve results from server.  %@", [error localizedDescription]];
         }
         
-        NSString *resultString = [json objectForKey:@"transcript"];
+        
+        //change start
+        //NSString *resultString = [json objectForKey:@"transcript"];
+        NSString *resultTranscript = [json objectForKey:@"transcript"];
+        //サーバーサイドでresultStringに英訳文字を追加
+        NSArray *resultarray =[resultTranscript componentsSeparatedByString:@"!%!"];
+        NSString *resultString = resultarray[0];
+        //change end
+        
         BOOL animating = YES;
+        
+
         
         if ( error != nil ) {
             resultString = [NSString stringWithFormat:@"%@ Try again later.", [error localizedDescription]];
@@ -240,7 +254,11 @@
             animating = NO;
         }
         else {
-            [self requestQA:resultString];
+            //change start
+            //英訳した文字列を投げる
+            //[self requestQA:resultString];
+            [self requestQA:resultarray[1]];
+            //change end
         }
         
         [logger logInfoWithMessages:@"Transcript: %@", resultString];
@@ -286,9 +304,16 @@
          //update ui in main thread
          dispatch_async(dispatch_get_main_queue(), ^{
             
+            //change 検索結果一覧への画面遷移は行わない
+            /*
             if ( [self.searchData count] > 0) {
                 [self performSegueWithIdentifier:@"detailsViewSeque" sender:self];
-            }
+            }*/
+            //add
+            //一番最初の回答を使用
+             NSData *reqdata = [self.searchData objectAtIndex:0];
+             NSString *reqtext = [reqdata valueForKey:@"text"];
+             [self requestTranslationToServer:reqtext];
             
             [self.activityView stopAnimating];
             [self.activityView setHidden:YES];
@@ -320,7 +345,7 @@
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES animated:animated];
     [self setSearchData:nil];
-    [self.queryLabel setText:@"What can Watson help you with today?"];
+    [self.queryLabel setText:@"Watsonに何かご質問はありますか？"];
     [self.recordButton setEnabled:YES];
 }
 
@@ -332,8 +357,47 @@
 
 
 
-
-
+//add
+-(void) requestTranslationToServer:(NSString*)reqtext {
+    [logger logInfoWithMessages:@"posting text to server..."];
+    
+    IMFResourceRequest * imfRequest = [IMFResourceRequest requestWithPath:translateURL method:@"POST"];
+    NSString *contentType = @"application/json";
+    [imfRequest setValue:contentType forHTTPHeaderField: @"Content-Type"];
+    NSStringEncoding encoding = NSUTF8StringEncoding;
+    //NSString *json = @"{\"text\":\"fkm\"}";
+    //NSData *jsonData = [json dataUsingEncoding:NSUTF8StringEncoding];
+    NSMutableData *body = [NSMutableData data];
+    NSString *tmpstr1 =@"{\"text\":\"";
+    NSString *tmpstr2 = [tmpstr1 stringByAppendingString:reqtext];
+    NSString *tmpstr3 = [tmpstr2 stringByAppendingString:@"\"}"];
+    [body appendData:[[NSString stringWithFormat:tmpstr3] dataUsingEncoding:encoding]];
+    [imfRequest setHTTPBody:body];
+    [imfRequest sendWithCompletionHandler:^(IMFResponse *response, NSError *error) {
+        //NSDictionary* json = response.responseJson;
+        NSString *restext = response.responseText;
+        if (restext == nil) {
+            restext = @{@"translate":@""};
+            [logger logErrorWithMessages:@"Unable to retrieve results from server.  %@", [error localizedDescription]];
+        }
+        if ( error != nil ) {
+            restext = [NSString stringWithFormat:@"%@ 後で実行してください。", [error localizedDescription]];
+            //animating = NO;
+        }
+        else if (restext == nil || [restext length] <= 0 || [restext isEqualToString:@""]) {
+            restext = @"ご質問が理解できませんでした。もう一度実行してください。";
+            //animating = NO;
+        }
+        [logger logInfoWithMessages:@"translated text: %@", restext];
+        [self.queryLabel setText:restext];
+        NSArray *key = [NSArray arrayWithObjects:@"text", nil];
+        NSArray *value =[NSArray arrayWithObjects:restext, nil];
+        NSDictionary *speakdic = [NSDictionary dictionaryWithObjects:value forKeys:key];
+        //NSDictionary *speakText = [NSDictionary dictionaryWithObjects:restext forKeys:@"text"];
+        [[SpeechManager sharedInstance] speak:speakdic];
+        
+    }];
+}
 
 
 

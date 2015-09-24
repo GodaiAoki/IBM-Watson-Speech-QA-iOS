@@ -28,6 +28,8 @@
     IMFLogger *logger;
     NSString *transcribeURL;
     NSString *askURL;
+    //add
+    NSString *translateURL;
 }
 
 

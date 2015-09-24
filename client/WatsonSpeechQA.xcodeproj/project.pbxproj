@@ -244,6 +244,7 @@
 				TargetAttributes = {
 					5D89DBD41B5DD28F0048DED1 = {
 						CreatedOnToolsVersion = 6.4;
+						DevelopmentTeam = 93US3CSM62;
 					};
 					5D89DBED1B5DD28F0048DED1 = {
 						CreatedOnToolsVersion = 6.4;
@@ -471,9 +472,12 @@
 			baseConfigurationReference = B12840A8A78758E9244FCCAF /* Pods-WatsonSpeechQA.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = WatsonSpeechQA/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -482,9 +486,12 @@
 			baseConfigurationReference = 11ED5F7394E1DB269F1296A5 /* Pods-WatsonSpeechQA.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = WatsonSpeechQA/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};
